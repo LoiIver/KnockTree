@@ -1,0 +1,59 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>Lemon Tree</title>
+	<script src="/Scripts/jquery-2.2.1.js"></script>
+	<script src="/Scripts/knockout-3.4.0.js"></script>
+	<script src="/Scripts/Model/TreeModel.js"></script>
+	<link rel="stylesheet" href="Content/Tree.css" />
+
+</head>
+<body>
+ 
+	<div class='tree' data-bind='with: tree'>
+		<ul data-bind='template: {name:"treeNode", foreach: children}'></ul>
+	</div>
+
+	<div data-bind='with: tree.selectedNode'>
+		<!-- ko with: data -->
+		<input data-bind='value:name'>
+		<!-- /ko   -->
+	</div>
+
+
+	<script id='treeNode' type='text/html'>
+		<li data-bind="css:{closed:isClosed,open:isOpen, leaf: isLeaf, last: isLast}, click: toggleOpen, clickBubble: false, attr:{'idNode': id}">
+			<ins></ins>
+			<span class='caption' data-bind="text:caption, css: {selected:isSelected},click:toggleSelection, clickBubble: false, attr:{'idNode': id}"></span>
+			<ul data-bind='template: {name:"treeNode", foreach: children}'></ul>
+		</li>
+	</script>
+
+
+	<script>
+
+		var vm = {
+			data: ko.observableArray(),
+			 
+			AddChildNode: function () {
+				var data = this.tree.selectedNode().data;
+				data.list.push(new SomeObject(data.list));
+			} 
+		}
+		$.ajax({
+			url: "api/data",
+			success: function (data) {
+				for (i = 0; i < data.length; i++) {
+					vm.data.push(new SomeObject(data[i]));
+				}
+				console.log('success');
+			}
+		});
+
+		vm.tree = new TreeView(vm.data, { caption: 'Caption', children: 'Nodes', id : 'Id' });
+		ko.applyBindings(vm);
+
+	</script>
+
+</body>
+</html>
